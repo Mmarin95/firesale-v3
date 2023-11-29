@@ -13,5 +13,8 @@ contextBridge.exposeInMainWorld('api', {
     },
     showExportHTMLDialog: (html: string) => {
         ipcRenderer.send('show-export-html-dialog', html);
+    },
+    saveFile: async(content: string) => {
+        ipcRenderer.send('save-file', content);
     }
 });

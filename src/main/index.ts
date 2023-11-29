@@ -2,6 +2,16 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 
+type MarkdownFile = {
+  content?: string;
+  filePath?: string;
+};
+
+let currentFile: MarkdownFile = {
+  content: '',
+  filePath: undefined,
+};
+
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -91,4 +101,36 @@ ipcMain.on('show-export-html-dialog', async (event, html: string) => {
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
   if (!browserWindow) return;
   showExportHtmlDialog(browserWindow, html);
+});
+
+const showSaveDialog = async (browserWindow: BrowserWindow, content: string) => {
+  const result = await dialog.showSaveDialog(browserWindow, {
+    title: 'Save Markdown',
+    defaultPath: app.getPath('documents'),
+    filters: [{ name: 'Markdown Files', extensions: ['md'] }]
+  });
+
+  if (result.canceled) return;
+
+  const { filePath } = result;
+
+  if (!filePath) return;
+
+  return filePath;
+}
+
+const saveFile = async (browserWindow: BrowserWindow, content: string) => {
+  const filePath =
+    currentFile.filePath ??
+    await showSaveDialog(browserWindow, content);
+
+  if (!filePath) return;
+
+  await writeFile(filePath, content, { encoding: 'utf-8' });
+};
+
+ipcMain.on('save-file', async (event, content: string) => {
+  const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (!browserWindow) return;
+  await saveFile(browserWindow, content);
 });

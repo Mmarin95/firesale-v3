@@ -14,3 +14,10 @@ Elements.ExportHtmlButton.addEventListener('click', () => {
   const html = Elements.RenderedView.innerHTML;
   window.api.showExportHTMLDialog(html);
 });
+
+Elements.SaveMarkdownButton.addEventListener('click', () => {
+  const content = Elements.MarkdownView.value;
+  window.api.saveFile(content);
+});
+
+Elements.SaveMarkdownButton.disabled = false;
