@@ -11,4 +11,7 @@ contextBridge.exposeInMainWorld('api', {
     showOpenDialog: () => {
         ipcRenderer.send('show-open-dialog');
     },
+    showExportHTMLDialog: (html: string) => {
+        ipcRenderer.send('show-export-html-dialog', html);
+    }
 });

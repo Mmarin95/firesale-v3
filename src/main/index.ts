@@ -1,5 +1,5 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 
 const createWindow = () => {
@@ -61,8 +61,34 @@ const openFile = async (browserWindow: BrowserWindow, filePath: string) => {
   browserWindow.webContents.send('file-opened', content, filePath);
 };
 
+const showExportHtmlDialog = async (browserWindow: BrowserWindow, html: string) => {
+  const result = await dialog.showSaveDialog(browserWindow, {
+    title: 'Export HTML',
+    defaultPath: app.getPath('documents'),
+    filters: [{ name: 'HTML Files', extensions: ['html'] }]
+  });
+
+  if (result.canceled) return;
+
+  const { filePath } = result;
+
+  if (!filePath) return;
+
+  exportHtml(html, filePath);
+}
+
+const exportHtml = async (html: string, filePath: string) => {
+  await writeFile(filePath, html, { encoding: 'utf-8' });
+};
+
 ipcMain.on('show-open-dialog', (event) => {
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
   if (!browserWindow) return;
   showOpenDialog(browserWindow);
+});
+
+ipcMain.on('show-export-html-dialog', async (event, html: string) => {
+  const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (!browserWindow) return;
+  showExportHtmlDialog(browserWindow, html);
 });

@@ -9,3 +9,8 @@ Elements.MarkdownView.addEventListener('input', async () => {
 Elements.OpenFileButton.addEventListener('click', () => {
   window.api.showOpenDialog();
 });
+
+Elements.ExportHtmlButton.addEventListener('click', () => {
+  const html = Elements.RenderedView.innerHTML;
+  window.api.showExportHTMLDialog(html);
+});

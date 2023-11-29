@@ -7,5 +7,6 @@ declare const MAIN_WINDOW_VITE_NAME: string;
 declare interface Window {
   api: {
     showOpenDialog: () => void;
+    showExportHTMLDialog: (html: string) => void;
   };
 }
