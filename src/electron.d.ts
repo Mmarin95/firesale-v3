@@ -9,5 +9,6 @@ declare interface Window {
     showOpenDialog: () => void;
     showExportHTMLDialog: (html: string) => void;
     saveFile: (content: string) => void;
+    checkForUnsavedChanges: (content: string) => Promise<boolean>;
   };
 }
