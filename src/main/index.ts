@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { BrowserWindow, Menu, MenuItemConstructorOptions, app, dialog, ipcMain, shell } from 'electron';
 import { readFile, writeFile } from 'fs/promises';
 import { basename, join } from 'path';
 
@@ -57,6 +57,7 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools({
     mode: 'detach',
   });
+  return mainWindow;
 };
 
 app.on('ready', createWindow);
@@ -174,3 +175,67 @@ ipcMain.on('open-in-default-app', () => {
 
   shell.openPath(currentFile.filePath);
 });
+
+const template: MenuItemConstructorOptions[] = [
+  {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Open',
+        accelerator: 'CmdOrCtrl+O',
+        click: () => {
+          let browserWindow = BrowserWindow.getFocusedWindow();
+          if (!browserWindow) browserWindow = createWindow();
+          showOpenDialog(browserWindow);
+        }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Show in Folder',
+        accelerator: 'CmdOrCtrl+Shift+O',
+        click: () => {
+          let browserWindow = BrowserWindow.getFocusedWindow();
+          if (!browserWindow) browserWindow = createWindow();
+          if (!currentFile.filePath) return;
+          shell.showItemInFolder(currentFile.filePath);
+        }
+      },
+      {
+        label: 'Open in Default Application',
+        accelerator: 'CmdOrCtrl+Shift+P',
+        click: () => {
+          let browserWindow = BrowserWindow.getFocusedWindow();
+          if (!browserWindow) browserWindow = createWindow();
+          if (!currentFile.filePath) return;
+          shell.openPath(currentFile.filePath);
+        }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Quit',
+        accelerator: 'CmdOrCtrl+Q',
+        click: () => {
+          app.quit();
+        }
+      }
+    ]
+  },
+  {
+    label: 'Edit',
+    role: 'editMenu',
+  },
+];
+
+if (process.platform === 'darwin') {
+  template.unshift({
+    label: app.name,
+    role: 'appMenu'
+  });
+}
+
+const menu = Menu.buildFromTemplate(template);
+Menu.setApplicationMenu(menu);
