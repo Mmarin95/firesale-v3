@@ -21,3 +21,11 @@ Elements.SaveMarkdownButton.addEventListener('click', () => {
   const content = Elements.MarkdownView.value;
   window.api.saveFile(content);
 });
+
+Elements.ShowFileButton.addEventListener('click', () => {
+  window.api.showInFolder();
+});
+
+Elements.OpenInDefaultApplicationButton.addEventListener('click', () => {
+  window.api.openInDefaultApp();
+});

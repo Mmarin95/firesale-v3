@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import { readFile, writeFile } from 'fs/promises';
 import { basename, join } from 'path';
 
@@ -161,4 +161,16 @@ ipcMain.on('save-file', async (event, content: string) => {
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
   if (!browserWindow) return;
   await saveFile(browserWindow, content);
+});
+
+ipcMain.on('show-in-folder', () => {
+  if (!currentFile.filePath) return;
+
+  shell.showItemInFolder(currentFile.filePath);
+});
+
+ipcMain.on('open-in-default-app', () => {
+  if (!currentFile.filePath) return;
+
+  shell.openPath(currentFile.filePath);
 });

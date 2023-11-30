@@ -4,6 +4,8 @@ import { renderMarkdown } from "./renderer/markdown";
 
 ipcRenderer.on('file-opened', (_, content: string, filePath: string) => {
     Elements.MarkdownView.value = content;
+    Elements.ShowFileButton.disabled = !filePath;
+    Elements.OpenInDefaultApplicationButton.disabled = !filePath;
     renderMarkdown(content)
 });
 
@@ -20,5 +22,11 @@ contextBridge.exposeInMainWorld('api', {
     checkForUnsavedChanges: async (content: string) => {
         const result = await ipcRenderer.invoke('has-changes', content);
         return result;
+    },
+    showInFolder: async () => {
+        ipcRenderer.send('show-in-folder');
+    },
+    openInDefaultApp: async () => {
+        ipcRenderer.send('open-in-default-app');
     }
 });
